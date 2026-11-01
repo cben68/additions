@@ -1,2 +1,2 @@
 # additions
-entraînement à l'ddition
+entraînement à l'addition
