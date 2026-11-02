@@ -1,0 +1,493 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f2f8f2">
+  <title>Les additions | Mon atelier de calcul</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #20342e;
+      --muted: #64746c;
+      --paper: #f2f8f2;
+      --white: #fffefa;
+      --green: #277b5d;
+      --green-dark: #1e644b;
+      --mint: #dcefe4;
+      --coral: #e8795d;
+      --yellow: #f5c95d;
+      --line: #dbe5dc;
+      --shadow: 0 16px 40px rgb(34 68 48 / 9%);
+      font-family: "DM Sans", sans-serif;
+      font-synthesis: none;
+      text-rendering: optimizeLegibility;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      min-width: 320px;
+      min-height: 100vh;
+      margin: 0;
+      color: var(--ink);
+      background-color: var(--paper);
+      background-image: radial-gradient(#c9ddcd 0.8px, transparent 0.8px);
+      background-size: 22px 22px;
+    }
+
+    button, input { font: inherit; }
+    button { color: inherit; }
+
+    .page { width: min(1120px, calc(100% - 40px)); margin: 0 auto; }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      min-height: 78px;
+      border-bottom: 1px solid rgb(32 52 46 / 10%);
+    }
+
+    .brand { display: flex; align-items: center; gap: 11px; font-weight: 700; }
+    .brand-mark {
+      display: grid;
+      width: 38px;
+      height: 38px;
+      place-items: center;
+      border-radius: 12px;
+      background: var(--green);
+      color: white;
+      font-family: "Fredoka", sans-serif;
+      font-size: 23px;
+      transform: rotate(-4deg);
+    }
+    .top-note { color: var(--muted); font-size: 14px; }
+
+    main { padding: 48px 0 64px; }
+
+    .intro { margin-bottom: 28px; }
+    .eyebrow {
+      margin: 0 0 8px;
+      color: var(--green);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 1.3px;
+      text-transform: uppercase;
+    }
+    h1, h2, p { margin-top: 0; }
+    h1, h2, .equation, .brand-mark { font-family: "Fredoka", sans-serif; }
+    h1 { margin-bottom: 7px; font-size: 38px; font-weight: 600; line-height: 1.1; }
+    .intro p:last-child { margin-bottom: 0; color: var(--muted); font-size: 16px; }
+
+    .workbench {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 300px;
+      gap: 20px;
+      align-items: stretch;
+    }
+
+    .exercise, .scoreboard {
+      border: 1px solid rgb(32 52 46 / 8%);
+      border-radius: 8px;
+      background: var(--white);
+      box-shadow: var(--shadow);
+    }
+
+    .exercise { min-height: 490px; padding: 26px 34px 30px; }
+    .exercise-top, .progress-labels, .score-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .round-label { color: var(--muted); font-size: 14px; font-weight: 600; }
+    .round-count { color: var(--ink); font-weight: 700; }
+
+    .progress-track {
+      height: 7px;
+      margin: 13px 0 26px;
+      overflow: hidden;
+      border-radius: 20px;
+      background: #e9eee8;
+    }
+    .progress-fill {
+      width: 10%;
+      height: 100%;
+      border-radius: inherit;
+      background: var(--green);
+      transition: width 250ms ease;
+    }
+
+    .level-label { margin-bottom: 10px; color: var(--muted); font-size: 13px; font-weight: 600; }
+    .levels {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+    }
+    .level-button {
+      min-height: 41px;
+      padding: 8px 10px;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background: white;
+      color: var(--muted);
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 600;
+      transition: background 150ms ease, border-color 150ms ease, color 150ms ease;
+    }
+    .level-button:hover { border-color: var(--green); color: var(--green-dark); }
+    .level-button[aria-pressed="true"] { border-color: var(--green); background: var(--mint); color: var(--green-dark); }
+
+    .problem-area { display: grid; min-height: 204px; place-items: center; padding: 18px 0 10px; }
+    .equation { display: flex; align-items: center; justify-content: center; gap: clamp(12px, 4vw, 30px); }
+    .number { min-width: 70px; text-align: center; font-size: clamp(48px, 7vw, 72px); font-weight: 600; line-height: 1; }
+    .operator { color: var(--coral); font-size: clamp(36px, 5vw, 52px); font-weight: 500; }
+    .answer-input {
+      width: 108px;
+      height: 84px;
+      padding: 6px;
+      border: 2px solid #c9d8cd;
+      border-radius: 8px;
+      outline: none;
+      background: #fffefa;
+      color: var(--green-dark);
+      font-family: "Fredoka", sans-serif;
+      font-size: 46px;
+      font-weight: 600;
+      text-align: center;
+      transition: border-color 150ms ease, box-shadow 150ms ease;
+    }
+    .answer-input:focus { border-color: var(--green); box-shadow: 0 0 0 4px rgb(39 123 93 / 13%); }
+    .answer-input:disabled { background: #f1f5f0; }
+
+    .actions { display: flex; align-items: center; justify-content: center; gap: 12px; }
+    .primary-button, .hint-button {
+      display: inline-flex;
+      min-height: 48px;
+      align-items: center;
+      justify-content: center;
+      gap: 9px;
+      padding: 0 20px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 700;
+      transition: transform 120ms ease, background 150ms ease;
+    }
+    .primary-button { min-width: 172px; border: 1px solid var(--green); background: var(--green); color: white; }
+    .primary-button:hover { background: var(--green-dark); }
+    .hint-button { border: 1px solid var(--line); background: white; color: var(--ink); }
+    .hint-button:hover { background: #f4f8f3; }
+    .primary-button:active, .hint-button:active { transform: translateY(1px); }
+    button:focus-visible { outline: 3px solid #edaa4b; outline-offset: 3px; }
+
+    .feedback {
+      min-height: 27px;
+      margin: 16px 0 0;
+      color: var(--muted);
+      font-size: 14px;
+      font-weight: 600;
+      text-align: center;
+    }
+    .feedback.correct { color: var(--green-dark); }
+    .feedback.incorrect { color: #b94e3d; }
+    .hint-box {
+      width: fit-content;
+      max-width: 100%;
+      margin: 8px auto 0;
+      padding: 10px 14px;
+      border-radius: 6px;
+      background: #fff2cc;
+      color: #66501c;
+      font-size: 14px;
+      text-align: center;
+    }
+    [hidden] { display: none !important; }
+
+    .scoreboard { display: flex; flex-direction: column; padding: 23px; }
+    .score-head { padding-bottom: 17px; border-bottom: 1px solid var(--line); }
+    .score-head h2 { margin: 0; font-size: 19px; font-weight: 500; }
+    .score-icon { display: grid; width: 34px; height: 34px; place-items: center; border-radius: 50%; background: #fff2cc; color: #775616; font-size: 19px; }
+    .score-total { padding: 22px 0 18px; }
+    .score-value { display: block; font-family: "Fredoka", sans-serif; font-size: 42px; font-weight: 600; line-height: 1.05; }
+    .score-caption { display: block; margin-top: 5px; color: var(--muted); font-size: 13px; }
+    .stat-row { display: flex; justify-content: space-between; padding: 13px 0; border-top: 1px solid #edf0ec; font-size: 14px; }
+    .stat-name { color: var(--muted); }
+    .stat-value { font-weight: 700; }
+    .encouragement { margin: auto 0 0; padding: 14px; border-radius: 6px; background: var(--mint); color: var(--green-dark); font-size: 14px; font-weight: 600; line-height: 1.5; }
+
+    .footer-note { margin: 20px 0 0; color: var(--muted); font-size: 12px; text-align: center; }
+
+    @media (max-width: 760px) {
+      .page { width: min(100% - 28px, 540px); }
+      .topbar { min-height: 66px; }
+      .top-note { font-size: 12px; }
+      main { padding: 30px 0 42px; }
+      h1 { font-size: 33px; }
+      .workbench { grid-template-columns: 1fr; gap: 14px; }
+      .exercise { min-height: 0; padding: 20px 18px 24px; }
+      .problem-area { min-height: 175px; }
+      .scoreboard { display: grid; grid-template-columns: 1fr 1fr; gap: 0 18px; padding: 17px; }
+      .score-head { grid-column: 1 / -1; }
+      .score-total { padding: 14px 0; }
+      .stat-row { align-items: center; }
+      .encouragement { grid-column: 1 / -1; margin-top: 10px; }
+    }
+
+    @media (max-width: 420px) {
+      .levels { gap: 5px; }
+      .level-button { padding: 7px 4px; font-size: 12px; }
+      .number { min-width: 48px; }
+      .answer-input { width: 82px; height: 72px; font-size: 40px; }
+      .actions { gap: 8px; }
+      .primary-button, .hint-button { padding: 0 12px; font-size: 14px; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { scroll-behavior: auto !important; transition-duration: 0.01ms !important; }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <header class="topbar">
+      <div class="brand"><span class="brand-mark" aria-hidden="true">+</span><span>Mon atelier de calcul</span></div>
+      <span class="top-note">Un petit calcul à la fois</span>
+    </header>
+
+    <main>
+      <section class="intro" aria-labelledby="page-title">
+        <p class="eyebrow">À toi de jouer !</p>
+        <h1 id="page-title">Les additions</h1>
+        <p>Choisis ton niveau et entraîne-toi à ton rythme.</p>
+      </section>
+
+      <div class="workbench">
+        <section class="exercise" aria-label="Exercice d'addition">
+          <div class="exercise-top">
+            <span class="round-label">Ma partie</span>
+            <span class="round-count" id="round-count">1 / 10</span>
+          </div>
+          <div class="progress-track" role="progressbar" aria-label="Progression de la partie" aria-valuemin="0" aria-valuemax="10" aria-valuenow="0">
+            <div class="progress-fill" id="progress-fill"></div>
+          </div>
+
+          <p class="level-label" id="level-label">Choisis un niveau</p>
+          <div class="levels" role="group" aria-labelledby="level-label">
+            <button class="level-button" type="button" data-level="easy" aria-pressed="true">Jusqu'à 20</button>
+            <button class="level-button" type="button" data-level="medium" aria-pressed="false">Jusqu'à 100</button>
+            <button class="level-button" type="button" data-level="challenge" aria-pressed="false">Défi des dizaines</button>
+          </div>
+
+          <div class="problem-area" aria-live="polite" aria-atomic="true">
+            <div class="equation" aria-label="Addition">
+              <span class="number" id="first-number">8</span>
+              <span class="operator" aria-hidden="true">+</span>
+              <span class="number" id="second-number">7</span>
+              <span class="operator" aria-hidden="true">=</span>
+              <input class="answer-input" id="answer" type="number" inputmode="numeric" min="0" max="100" aria-label="Ta réponse" autocomplete="off">
+            </div>
+          </div>
+
+          <div class="actions">
+            <button class="primary-button" id="submit-answer" type="button"><span id="submit-label">Vérifier</span><span aria-hidden="true">→</span></button>
+            <button class="hint-button" id="show-hint" type="button"><span aria-hidden="true">✦</span> Un indice</button>
+          </div>
+          <p class="feedback" id="feedback" role="status" aria-live="polite">Prêt·e ? Écris ta réponse !</p>
+          <p class="hint-box" id="hint-box" hidden></p>
+        </section>
+
+        <aside class="scoreboard" aria-label="Mon tableau de score">
+          <div class="score-head"><h2>Mon tableau de score</h2><span class="score-icon" aria-hidden="true">★</span></div>
+          <div class="score-total"><span class="score-value" id="score-value">0 / 10</span><span class="score-caption">bonnes réponses</span></div>
+          <div class="stat-row"><span class="stat-name">Série en cours</span><span class="stat-value" id="streak-value">0</span></div>
+          <div class="stat-row"><span class="stat-name">Meilleure série</span><span class="stat-value" id="best-streak">0</span></div>
+          <p class="encouragement" id="encouragement">Chaque essai te fait progresser. À toi de jouer !</p>
+        </aside>
+      </div>
+      <p class="footer-note">Tu peux aussi appuyer sur Entrée pour vérifier ta réponse.</p>
+    </main>
+  </div>
+
+  <script>
+    const totalQuestions = 10;
+    const firstNumber = document.querySelector("#first-number");
+    const secondNumber = document.querySelector("#second-number");
+    const answerInput = document.querySelector("#answer");
+    const feedback = document.querySelector("#feedback");
+    const hintBox = document.querySelector("#hint-box");
+    const submitButton = document.querySelector("#submit-answer");
+    const submitLabel = document.querySelector("#submit-label");
+    const progressTrack = document.querySelector(".progress-track");
+    const progressFill = document.querySelector("#progress-fill");
+    const levelButtons = [...document.querySelectorAll(".level-button")];
+    const encouragement = document.querySelector("#encouragement");
+
+    let level = "easy";
+    let score = 0;
+    let streak = 0;
+    let bestStreak = 0;
+    let questionNumber = 0;
+    let currentAnswer = 0;
+    let answered = false;
+    let finished = false;
+
+    function randomInteger(minimum, maximum) {
+      return Math.floor(Math.random() * (maximum - minimum + 1)) + minimum;
+    }
+
+    function makeQuestion() {
+      if (level === "easy") {
+        const first = randomInteger(1, 10);
+        const second = randomInteger(1, 20 - first);
+        return [first, second];
+      }
+
+      if (level === "medium") {
+        const first = randomInteger(10, 70);
+        const second = randomInteger(1, 100 - first);
+        return [first, second];
+      }
+
+      for (let attempt = 0; attempt < 100; attempt += 1) {
+        const first = randomInteger(12, 88);
+        const minimumSecond = 10 - (first % 10);
+        const maximumSecond = Math.min(20, 100 - first);
+        if (minimumSecond <= maximumSecond) {
+          return [first, randomInteger(minimumSecond, maximumSecond)];
+        }
+      }
+
+      return [38, 7];
+    }
+
+    function showQuestion() {
+      const [first, second] = makeQuestion();
+      firstNumber.textContent = first;
+      secondNumber.textContent = second;
+      currentAnswer = first + second;
+      answerInput.value = "";
+      answerInput.disabled = false;
+      answered = false;
+      hintBox.hidden = true;
+      feedback.textContent = "Prêt·e ? Écris ta réponse !";
+      feedback.className = "feedback";
+      submitLabel.textContent = "Vérifier";
+      answerInput.focus();
+    }
+
+    function updateScoreboard() {
+      document.querySelector("#score-value").textContent = `${score} / ${totalQuestions}`;
+      document.querySelector("#streak-value").textContent = streak;
+      document.querySelector("#best-streak").textContent = bestStreak;
+      document.querySelector("#round-count").textContent = `${Math.min(questionNumber + 1, totalQuestions)} / ${totalQuestions}`;
+      progressFill.style.width = `${(questionNumber / totalQuestions) * 100}%`;
+      progressTrack.setAttribute("aria-valuenow", questionNumber);
+    }
+
+    function finishGame() {
+      finished = true;
+      answered = true;
+      answerInput.disabled = true;
+      submitLabel.textContent = "Rejouer";
+      progressFill.style.width = "100%";
+      progressTrack.setAttribute("aria-valuenow", totalQuestions);
+      feedback.className = "feedback correct";
+      feedback.textContent = score === totalQuestions
+        ? "Bravo, sans faute ! Quelle belle partie !"
+        : `Partie terminée ! Tu as trouvé ${score} bonne${score > 1 ? "s" : ""} réponse${score > 1 ? "s" : ""} sur ${totalQuestions}.`;
+      encouragement.textContent = score === totalQuestions
+        ? "Quelle belle réussite ! Tu peux essayer un autre niveau."
+        : "Bien joué pour tes efforts ! Une nouvelle partie t'attend.";
+      submitButton.querySelector("span[aria-hidden='true']").textContent = "↻";
+    }
+
+    function checkAnswer() {
+      if (finished) {
+        startGame();
+        return;
+      }
+      if (answered) {
+        questionNumber += 1;
+        if (questionNumber >= totalQuestions) {
+          finishGame();
+        } else {
+          updateScoreboard();
+          showQuestion();
+        }
+        return;
+      }
+
+      if (answerInput.value.trim() === "") {
+        feedback.textContent = "Écris un nombre avant de vérifier.";
+        feedback.className = "feedback incorrect";
+        answerInput.focus();
+        return;
+      }
+
+      const isCorrect = Number(answerInput.value) === currentAnswer;
+      answered = true;
+      answerInput.disabled = true;
+      if (isCorrect) {
+        score += 1;
+        streak += 1;
+        bestStreak = Math.max(bestStreak, streak);
+        feedback.textContent = streak > 1 ? `Oui ! ${streak} bonnes réponses à la suite !` : "Oui, c'est la bonne réponse !";
+        feedback.className = "feedback correct";
+        encouragement.textContent = streak > 1 ? "Ta série grandit, continue comme ça !" : "Bien joué ! Chaque bonne réponse compte.";
+      } else {
+        streak = 0;
+        feedback.textContent = `Pas tout à fait : la réponse était ${currentAnswer}. On continue !`;
+        feedback.className = "feedback incorrect";
+        encouragement.textContent = "Se tromper, c'est aussi apprendre. Prêt·e pour la suite ?";
+      }
+      updateScoreboard();
+      submitLabel.textContent = questionNumber === totalQuestions - 1 ? "Voir mon score" : "Suivant";
+      submitButton.querySelector("span[aria-hidden='true']").textContent = "→";
+    }
+
+    function startGame() {
+      score = 0;
+      streak = 0;
+      questionNumber = 0;
+      finished = false;
+      submitButton.querySelector("span[aria-hidden='true']").textContent = "→";
+      encouragement.textContent = "Chaque essai te fait progresser. À toi de jouer !";
+      updateScoreboard();
+      showQuestion();
+    }
+
+    document.querySelector("#show-hint").addEventListener("click", () => {
+      const first = Number(firstNumber.textContent);
+      const second = Number(secondNumber.textContent);
+      const toNextTen = 10 - (first % 10);
+      if (toNextTen === 10) {
+        hintBox.textContent = `${first} est déjà une dizaine. Essaie de séparer ${second} en deux morceaux !`;
+      } else if (second >= toNextTen) {
+        hintBox.textContent = `Sépare ${second} en ${toNextTen} et ${second - toNextTen} : d'abord, complète ${first} jusqu'à la dizaine suivante.`;
+      } else {
+        hintBox.textContent = `Compte ${second} petits pas après ${first}. Tu peux aussi dessiner des points !`;
+      }
+      hintBox.hidden = false;
+    });
+
+    levelButtons.forEach((button) => {
+      button.addEventListener("click", () => {
+        level = button.dataset.level;
+        levelButtons.forEach((levelButton) => levelButton.setAttribute("aria-pressed", String(levelButton === button)));
+        startGame();
+      });
+    });
+
+    submitButton.addEventListener("click", checkAnswer);
+    answerInput.addEventListener("keydown", (event) => {
+      if (event.key === "Enter") checkAnswer();
+    });
+
+    startGame();
+  </script>
+</body>
+</html>
